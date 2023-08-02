@@ -7,11 +7,7 @@ const mongoose = require("mongoose")
 app.use(express.json())
 
 //create a function and paste this from mongodb.
-//const mongoUrl = "mongodb+srv://abiodun:GV@mJn8QNt66yNy@cluster0.qru9uw2.mongodb.net/?retryWrites=true&w=majority"
-const mongoUrl = 'mongodb+srv://abiodun:GV@mJn8QNt66yNy@cluster0.qru9uw2.mongodb.net/test?retryWrites=true&w=majority';
-
-//const mongoUrl = 'mongodb://abiodun:GV@mJn8QNt66yN@hostname:port/database';
-
+const mongoUrl = 'mongodb+srv://abiodun:abiodun@cluster0.huo81ir.mongodb.net/?retryWrites=true&w=majority';
 
 //connect mongodb by passing the url and usenewurl.
 mongoose
@@ -24,11 +20,8 @@ mongoose
   })
   .catch((e) => console.log(e));
 
-
-
-
 //listen to see if it has started on port number 5000.
-app.listen(8000, ()=> {
+app.listen(8080, ()=> {
     console.log("server started");
 })
 
@@ -53,4 +46,25 @@ app.post("/post", async(req, res)=>{
         res.send({status: "you made a mistake."})
     }
 
+})
+
+//import userdetails schema.
+require("./userDetails")
+
+//create a variable to access the model in userdetails.
+const User = mongoose.model("userInfo")
+
+app.post("/register", async (req, res)=> {
+    const {name, email, number} = req.body;
+    try {
+        await User.create({
+            username: name,
+            //because it's written the same way.
+            email,
+            pnumber: number,
+        });
+        res.send({status:"okay"})
+    } catch (error) {
+        res.send({status: "errorrr"})
+    }
 })
