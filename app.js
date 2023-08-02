@@ -11,6 +11,9 @@ const cors = require ("cors")
 //then use it.
 app.use(cors());
 
+//import bcryptjs.
+const bcryptjs = require ("bcryptjs")
+
 //create a function and paste this from mongodb.
 const mongoUrl = 'mongodb+srv://abiodun:abiodun@cluster0.huo81ir.mongodb.net/?retryWrites=true&w=majority';
 
@@ -34,18 +37,22 @@ mongoose
   app.post("/register", async(req, res)=> {
     //get all required data from req.body
     const{email, password, confirmPassword, number, sex} = req.body;
+    //create a variable to add bcryptjs to the password.
+    const encryptedPassword = await bcryptjs.hash(password, 10)
     try {
         //handling the unique email ish here.
-        const oldUser = User.findOne({ email })
+        //added await so it will have time to execute, if not user already exist will keep popping.
+        const oldUser = await User.findOne({ email })
         //if there's an existing user?
         if(oldUser){
-            res.send({error:"User already exists."})
+            //put return to ensure the next code block is not fired if api returns error.
+        return  res.send({error:"User already exists."})
         }
         //this will create a new user in the mongodb.
         await User.create({
             email, 
-            password, 
-            confirmPassword, 
+            password:encryptedPassword, 
+            confirmPassword:encryptedPassword, 
             number, 
             sex,
         });
