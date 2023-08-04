@@ -14,6 +14,12 @@ app.use(cors());
 //import bcryptjs.
 const bcryptjs = require ("bcryptjs")
 
+//import jwebtoken.
+const jwt = require ("jsonwebtoken")
+
+//random numbers and characters.
+const JWT_SECRET = "hgskdfdskfhdskfjds(*7mbvm )[}':khw4we£4BN";
+
 //create a function and paste this from mongodb.
 const mongoUrl = 'mongodb+srv://abiodun:abiodun@cluster0.huo81ir.mongodb.net/?retryWrites=true&w=majority';
 
@@ -59,6 +65,38 @@ mongoose
         res.send({status:"oka"})
     } catch (error) {
         res.send({status:"error"})
+    }
+  });
+
+  //create login api.
+  app.post("/login", async(req, res)=> {
+    const{email, password} = req.body;
+    //to find if user exist or not.
+    const user = await User.findOne({ email });
+    if(!user){
+    return  res.send({error:"user not found."})
+    } //decrypt password. use await because it might take time.
+    //compare to compare password with the one from users.
+    if(await bcryptjs.compare(password, user.password)){
+        //use functional variable of sign.
+        const token=jwt.sign({}, JWT_SECRET);
+        //if user successfully logs in?
+        if(res.status(200)){
+            return res.json({status: "okay", data:token })
+        }else {
+            return res.json({error: "error"})
+        }
+    }
+    res.json({status: "error", error:"incorrect password"})
+  })
+
+  //create api for user data when logged in. 
+  app.post("/userData", async(req, res)=> {
+    const { token } = req.body;
+    try {
+        const user = jwt.verify(token, JWT_SECRET)
+    } catch (error) {
+        
     }
   })
 
