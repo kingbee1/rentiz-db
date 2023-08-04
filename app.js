@@ -94,11 +94,22 @@ mongoose
   app.post("/userData", async(req, res)=> {
     const { token } = req.body;
     try {
+      //we first verify and store the value in user.
         const user = jwt.verify(token, JWT_SECRET)
+        //to access the users email address.
+        const userEmail = user.email;
+        //find it with findOne, if found, then promise.
+        User.findOne({ email: userEmail }).then((data)=> {
+          res.send({ status:"okay", data: data })
+        }).catch((error)=> {
+          res.send({ status:"error", data: data })
+        })
+
     } catch (error) {
         
     }
   })
+
 
 //listen to see if it has started on port number 5000.
 app.listen(5000, ()=> {
